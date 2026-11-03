@@ -1,0 +1,69 @@
+---
+/**
+ * Light/dark mode toggle for the guide.
+ *
+ * - Click toggles the theme and persists the choice in localStorage.
+ * - Until the user chooses, the theme follows the OS prefers-color-scheme
+ *   (and keeps following live changes to it).
+ * - The head inline script in Layout.astro applies the theme before first
+ *   paint, so a refresh never flashes the wrong colors.
+ * - Sun/moon icons swap via CSS (see global.css) so there is no icon flicker.
+ */
+---
+
+<button
+  id="theme-toggle"
+  class="theme-toggle"
+  type="button"
+  aria-label="Switch between light and dark theme"
+  title="Toggle theme"
+>
+  <!-- Moon: shown in light mode, click switches to dark -->
+  <svg class="icon-moon" aria-hidden="true" viewBox="0 0 24 24">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+  </svg>
+  <!-- Sun: shown in dark mode, click switches to light -->
+  <svg class="icon-sun" aria-hidden="true" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+  </svg>
+</button>
+
+<script>
+  const KEY = 'theme';
+  const root = document.documentElement;
+  const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+
+  const chroma: Record<string, string> = {
+    dark: '#07090d',
+    light: '#f2f5fa',
+  };
+
+  const apply = (theme: string) => {
+    root.dataset.theme = theme;
+    meta?.setAttribute('content', chroma[theme] ?? chroma.dark);
+  };
+
+  // Sync with the theme already set by the inline head script.
+  apply(root.dataset.theme === 'light' ? 'light' : 'dark');
+
+  const button = document.getElementById('theme-toggle');
+
+  button?.addEventListener('click', () => {
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+
+    // Briefly enable cross-fade transitions, then remove so page load
+    // and unrelated style changes never animate.
+    document.documentElement.classList.add('theme-anim');
+    apply(next);
+    localStorage.setItem(KEY, next);
+    window.setTimeout(() => document.documentElement.classList.remove('theme-anim'), 280);
+  });
+
+  // Follow OS-level appearance changes while no explicit choice is stored.
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (event) => {
+    if (!localStorage.getItem(KEY)) {
+      apply(event.matches ? 'light' : 'dark');
+    }
+  });
+</script>
