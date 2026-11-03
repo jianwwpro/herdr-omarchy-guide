@@ -1,0 +1,146 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+
+const nav = [
+  { href: '#basics', label: 'Basics' },
+  { href: '#keys', label: 'Keys' },
+  { href: '#layouts', label: 'Layouts' },
+  { href: '#agents', label: 'Agents' },
+  { href: '#cli', label: 'CLI' },
+  { href: '#config', label: 'Config' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#07090d" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#top" aria-label="Herdr on Omarchy, back to top">
+          <span class="brand-mark" aria-hidden="true">❯</span>
+          <span class="brand-text">herdr<span class="brand-slash">/</span>omarchy</span>
+        </a>
+
+        <nav class="site-nav" aria-label="Sections">
+          {nav.map((link) => <a href={link.href}>{link.label}</a>)}
+        </nav>
+
+        <span class="header-badge">v0.9.1</span>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <span class="brand-mark" aria-hidden="true">❯</span>
+          <div>
+            <p class="footer-title">herdr / omarchy</p>
+            <p class="footer-note">
+              A quick guide generated from the live config on this machine — Herdr 0.9.1, Omarchy 4.0.6.
+            </p>
+          </div>
+        </div>
+
+        <div class="footer-links">
+          <a href="https://herdr.dev/tui/" target="_blank" rel="noreferrer">Herdr TUI docs ↗</a>
+          <a href="https://learn.omacom.io" target="_blank" rel="noreferrer">Omarchy manual ↗</a>
+          <a href="https://github.com/herdrdev/herdr" target="_blank" rel="noreferrer">GitHub ↗</a>
+        </div>
+      </div>
+      <div class="container footer-fine">
+        <span><kbd>Ctrl</kbd> + <kbd>Space</kbd> is your prefix. Press and release, then the next key.</span>
+        <span>Built with Astro. Last checked 3 Nov 2026.</span>
+      </div>
+    </footer>
+
+    <script>
+      // Copy-to-clipboard for every [data-copy] button.
+      async function copyText(text: string) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {
+          const area = document.createElement('textarea');
+          area.value = text;
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          const ok = document.execCommand('copy');
+          area.remove();
+          return ok;
+        }
+      }
+
+      document.addEventListener('click', async (event) => {
+        const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-copy]');
+        if (!button) return;
+
+        const ok = await copyText(button.dataset.copy ?? '');
+        if (!ok) return;
+
+        const label = button.querySelector('.copy-label');
+        const previous = label?.textContent ?? 'Copy';
+        button.classList.add('copied');
+        if (label) label.textContent = 'Copied';
+
+        window.setTimeout(() => {
+          button.classList.remove('copied');
+          if (label) label.textContent = previous;
+        }, 1400);
+      });
+
+      // Highlight the current section in the top nav.
+      const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('.site-nav a')];
+      const sections = navLinks
+        .map((link) => document.querySelector<HTMLElement>(link.getAttribute('href') ?? ''))
+        .filter((section): section is HTMLElement => Boolean(section));
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+
+          for (const link of navLinks) {
+            link.toggleAttribute('aria-current', link.getAttribute('href') === `#${visible.target.id}`);
+          }
+        },
+        { rootMargin: '-20% 0px -65% 0px', threshold: [0, 0.2, 0.6] },
+      );
+
+      for (const section of sections) observer.observe(section);
+    </script>
+  </body>
+</html>

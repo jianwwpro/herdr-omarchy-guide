@@ -1,0 +1,57 @@
+---
+interface Props {
+  combo: string;
+  compact?: boolean;
+}
+
+const { combo, compact = false } = Astro.props;
+
+const labels: Record<string, string> = {
+  ctrl: 'Ctrl',
+  alt: 'Alt',
+  shift: 'Shift',
+  super: 'Super',
+  prefix: 'Prefix',
+  enter: 'Enter',
+  esc: 'Esc',
+  tab: 'Tab',
+  space: 'Space',
+  left: '←',
+  right: '→',
+  up: '↑',
+  down: '↓',
+};
+
+const alternatives = combo.split('/').map((part) => part.trim());
+---
+
+<span class:list={['keycombo', { compact }]}>
+  {
+    alternatives.map((sequence, index) => {
+      const parts = sequence.split('+').map((part) => part.trim());
+      const isPrefixSequence = parts[0] === 'prefix';
+      return (
+        <>
+          {index > 0 && <span class="alt">or</span>}
+          <span class="sequence">
+            {parts.map((part, partIndex) => (
+              <>
+                {partIndex > 0 && (
+                  <span class="join" aria-hidden="true">
+                    {isPrefixSequence && partIndex === 1 ? '→' : '+'}
+                  </span>
+                )}
+                <kbd
+                  class:list={{ prefix: part === 'prefix', narrow: part === '?' || part === ';' || part === '[' }}
+                  title={part === 'prefix' ? 'Prefix key: Ctrl + Space' : undefined}
+                >
+                  {labels[part] ?? part}
+                </kbd>
+              </>
+            ))}
+          </span>
+        </>
+      );
+    })
+  }
+</span>

@@ -1,0 +1,691 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Key from '../components/Key.astro';
+import Command from '../components/Command.astro';
+import { shortcutGroups, cliGroups } from '../data/shortcuts';
+
+const totalShortcuts = shortcutGroups.reduce((sum, group) => sum + group.items.length, 0);
+
+const title = 'herdr on Omarchy — the quick guide';
+const description =
+  'Tips, keybindings, layouts, and CLI recipes for Herdr, the terminal workspace manager for AI coding agents, as configured on Omarchy Linux.';
+---
+
+<Layout title={title} description={description}>
+  <div class="container" id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">
+          <span class="pulse"></span>
+          herdr 0.9.1
+          <span class="sep">/</span>
+          omarchy 4.0.6
+        </span>
+
+        <h1>
+          herdr,
+          <span class="gradient">without the manual.</span>
+        </h1>
+
+        <p class="hero-lead">
+          The terminal workspace manager for AI coding agents — already installed, themed, and bound to
+          keys on Omarchy. This is the short version: <strong>one prefix, three layers, four panes, and
+          every agent in one sidebar.</strong>
+        </p>
+
+        <div class="hero-actions">
+          <a class="button button-primary" href="#keys">Shortcut reference</a>
+          <a class="button button-ghost" href="#layouts">The hdl layout <span class="arrow">→</span></a>
+        </div>
+
+        <div class="hero-meta">
+          <span>Prefix</span>
+          <Key combo="ctrl+space" compact />
+          <span class="divider"></span>
+          <span><Key combo="super+ctrl+enter" compact /> launch</span>
+          <span class="divider"></span>
+          <span><Key combo="super+s" compact /> scratchpad</span>
+        </div>
+      </div>
+
+      <div class="window" aria-hidden="true">
+        <div class="mock-bar">
+          <span class="mock-dots"><i></i><i></i><i></i></span>
+          <span class="mock-title">company — herdr</span>
+          <span class="mock-version">0.9.1</span>
+        </div>
+
+        <div class="mock-body">
+          <aside class="mock-side">
+            <div class="mock-side-label">workspace</div>
+            <div class="mock-workspace"><span class="chevron">▾</span> company</div>
+
+            <div class="mock-agent active"><span class="dot working"></span> opencode <span class="state">work</span></div>
+            <div class="mock-agent"><span class="dot blocked"></span> pi <span class="state">needs</span></div>
+            <div class="mock-agent"><span class="dot idle"></span> lazyvim <span class="state">idle</span></div>
+
+            <div class="mock-side-label mock-tabs-side">tabs</div>
+            <div class="mock-tab-item active"><span class="num">1</span> simple-demo</div>
+            <div class="mock-tab-item"><span class="num">2</span> api-refactor</div>
+          </aside>
+
+          <div class="mock-main">
+            <div class="mock-tabbar">
+              <span class="mock-tab-pill">1 simple-demo</span>
+              <span class="mock-tab-plus">+</span>
+            </div>
+
+            <div class="mock-grid">
+              <div class="mock-pane nvim">
+                <span class="pane-tag">lazyvim</span>
+                <div class="code-lines"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              </div>
+
+              <div class="mock-pane opencode">
+                <span class="pane-tag">opencode · c</span>
+                <div class="message"><b>review the diff</b>checking 4 changed files…</div>
+                <div class="code-lines warm"><i></i><i></i><i></i></div>
+              </div>
+
+              <div class="mock-pane pi">
+                <span class="pane-tag">pi</span>
+                <div class="message"><b>needs you</b>approve the migration?</div>
+                <div class="code-lines"><i></i><i></i></div>
+              </div>
+
+              <div class="mock-pane term">
+                <span class="mock-prompt">❯</span>
+                <span class="mock-cmd">hdl c pi</span>
+                <span class="cursor"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="basics">
+      <div class="section-head">
+        <div class="section-head-main">
+          <span class="section-kicker">01 · Basics</span>
+          <h2>One server. Three layers. Zero lost work.</h2>
+          <p class="section-lede">
+            Panes live in a small Herdr server on this machine, not in the terminal window. Close the
+            window, switch to another Hyprland workspace, or detach — the agents keep running.
+          </p>
+        </div>
+        <div class="section-aside">
+          <Key combo="super+ctrl+enter" /> launch or attach<br />
+          <Key combo="prefix+d" /> detach
+        </div>
+      </div>
+
+      <div class="quick-grid">
+        <article class="card quick-card">
+          <div class="keys"><span class="inline-code">workspace</span></div>
+          <h3>A project</h3>
+          <p>
+            The top layer. Herdr can give a workspace its own git worktree, and the sidebar groups
+            agents by workspace. New one: <Key combo="prefix+shift+c" compact />
+          </p>
+        </article>
+
+        <article class="card quick-card">
+          <div class="keys"><span class="inline-code">tab</span></div>
+          <h3>A task</h3>
+          <p>
+            One repo can have several tasks in flight. <code>hdl</code> names a tab after the folder and
+            fills it with panes. New one: <Key combo="prefix+c" compact />
+          </p>
+        </article>
+
+        <article class="card quick-card">
+          <div class="keys"><span class="inline-code">pane</span></div>
+          <h3>A real terminal</h3>
+          <p>
+            An agent, LazyVim, or a plain shell. Split with <Key combo="prefix+h" compact /> or
+            <Key combo="prefix+v" compact />, zoom with <Key combo="prefix+z" compact />
+          </p>
+        </article>
+      </div>
+
+      <div class="note-callout">
+        <span class="mark">!</span>
+        <span>
+          <strong>Closing the window is not quitting.</strong> Detach with <Key combo="prefix+d" compact /> when
+          you want a clean exit. To really end everything — and every process inside — use
+          <code>herdr server stop</code>.
+        </span>
+      </div>
+    </section>
+
+    <section class="section" id="keys">
+      <div class="section-head">
+        <div class="section-head-main">
+          <span class="section-kicker">02 · Keys</span>
+          <h2>The whole keymap, minus the memorising.</h2>
+          <p class="section-lede">
+            This is the live Omarchy seed config, not the Herdr defaults. Filter it, or open
+            <Key combo="super+ctrl+k" compact /> for Omarchy's annotated picker.
+          </p>
+        </div>
+        <div class="section-aside">{totalShortcuts} bindings · prefix is Ctrl+Space</div>
+      </div>
+
+      <div class="prefix-banner">
+        <span class="label"><strong>Prefix</strong> — press and release, then the next key.</span>
+        <Key combo="ctrl+space" />
+        <span class="example">
+          <Key combo="prefix+h" compact />
+          <span>split sideways</span>
+        </span>
+      </div>
+
+      <div class="key-toolbar">
+        <label class="search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+          <input
+            id="key-filter"
+            type="search"
+            placeholder="Filter by action or key…"
+            autocomplete="off"
+            aria-label="Filter shortcuts"
+          />
+          <span class="slash-hint">/</span>
+        </label>
+        <span class="key-count" data-key-count>{totalShortcuts} bindings</span>
+      </div>
+
+      <div class="key-groups" id="key-groups">
+        {
+          shortcutGroups.map((group) => (
+            <article class="card key-group" data-group={group.id} data-total={group.items.length}>
+              <div class="key-group-head">
+                <h3>{group.title}</h3>
+                <span class="count">{group.items.length} keys</span>
+              </div>
+              <p>{group.blurb}</p>
+
+              {group.items.map((item) => (
+                <div
+                  class="key-row"
+                  data-search={`${item.action} ${item.hint ?? ''} ${item.keys}`.toLowerCase()}
+                >
+                  <span class="action">
+                    {item.action}
+                    {item.hint && <span class="hint">{item.hint}</span>}
+                  </span>
+                  <Key combo={item.keys} compact />
+                </div>
+              ))}
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="no-results" id="key-empty" hidden>
+        No binding matches that. Clear the filter, or try “split”, “tab”, or “agent”.
+      </div>
+    </section>
+
+    <section class="section" id="layouts">
+      <div class="section-head">
+        <div class="section-head-main">
+          <span class="section-kicker">03 · Layouts</span>
+          <h2>Stop arranging panes by hand.</h2>
+          <p class="section-lede">
+            Omarchy ships four shell functions that build agent layouts inside the pane you are sitting
+            in. They use <code>$HERDR_PANE_ID</code>, so run them from a Herdr shell.
+          </p>
+        </div>
+        <div class="section-aside">hdl · hds · hdlm · hsl<br />defined in Omarchy's bash functions</div>
+      </div>
+
+      <article class="card recipe-feature">
+        <div class="recipe-feature-head">
+          <span class="recipe-index">01</span>
+          <h3>The four-pane agent desk</h3>
+          <span class="badge">dev layout</span>
+          <span class="cmd-chip">hdl c pi</span>
+        </div>
+
+        <div class="recipe-body">
+          <div class="recipe-copy">
+            <p>
+              <code>hdl</code> takes the current pane, renames the tab after the folder, then splits:
+              an 85% editor area on the left, two agent panes stacked at 30% width on the right, and a
+              15% terminal strip along the bottom. LazyVim opens in the main pane.
+            </p>
+            <p>
+              The arguments are commands, not magic words: <code>c</code> is Omarchy's alias for
+              <code>opencode --auto</code> and <code>pi</code> is Pi. Pass a second agent to stack it:
+              <code>hdl c</code>, <code>hdl cx pi</code>, <code>hdl cy</code>.
+            </p>
+
+            <Command cmd="cd ~/Projects/my-app && hdl c pi" />
+
+            <ol class="steps">
+              <li>Open a Herdr pane and <code>cd</code> into the repo.</li>
+              <li>Run <code>hdl c pi</code>. The tab is renamed and the layout appears.</li>
+              <li>Use <code>prefix+z</code> to zoom the editor, <code>prefix+h/v</code> to re-split.</li>
+              <li>Use <code>prefix+g</code> to jump back to whichever agent needs you.</li>
+            </ol>
+          </div>
+
+          <div>
+            <div class="diagram hdl" aria-hidden="true">
+              <div class="pane nvim"><b>lazyvim</b><span>nvim .</span></div>
+              <div class="pane ai"><b>opencode</b><span>c · opencode --auto</span></div>
+              <div class="pane ai2"><b>pi</b><span>second agent</span></div>
+              <div class="pane term"><b>shell</b><span>15% strip</span></div>
+            </div>
+            <div class="note-callout" style="margin-top:14px">
+              <span class="mark">↳</span>
+              <span>
+                No Herdr? The functions bail out early with “You must start herdr to use hdl.”
+                Launch with <Key combo="super+ctrl+enter" compact /> first.
+              </span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <div class="recipe-grid">
+        <article class="card recipe-card">
+          <h3><span class="cmd">hds</span> Dev square</h3>
+          <p>
+            Four equal-ish panes: nvim top-left, <code>hunk diff --watch</code> top-right, a shell
+            bottom-left, opencode bottom-right. No arguments.
+          </p>
+          <div class="diagram hds" aria-hidden="true">
+            <div class="pane nvim"><b>nvim</b><span>editor</span></div>
+            <div class="pane ai2"><b>hunk</b><span>diff --watch</span></div>
+            <div class="pane term"><b>shell</b><span>terminal</span></div>
+            <div class="pane ai"><b>opencode</b><span>agent</span></div>
+          </div>
+        </article>
+
+        <article class="card recipe-card">
+          <h3><span class="cmd">hdlm</span> Monorepo tabs</h3>
+          <p>
+            Renames the workspace to the current folder, then runs <code>hdl</code> once per
+            subdirectory — one tab per package. Pass the same agent arguments.
+          </p>
+          <div class="tab-stack" aria-hidden="true">
+            <span>apps/web</span>
+            <span>apps/api</span>
+            <span>packages/ui</span>
+          </div>
+        </article>
+
+        <article class="card recipe-card">
+          <h3><span class="cmd">hsl</span> Agent swarm</h3>
+          <p>
+            Tiles N panes and starts the same command in each. Quote the command. Good for fan-out
+            reviews, test shards, or one agent per hypothesis.
+          </p>
+          <div class="diagram hsl" aria-hidden="true">
+            <div class="pane ai"><b>opencode</b><span>#1</span></div>
+            <div class="pane ai"><b>opencode</b><span>#2</span></div>
+            <div class="pane ai"><b>opencode</b><span>#3</span></div>
+            <div class="pane ai"><b>opencode</b><span>#4</span></div>
+          </div>
+          <Command cmd="hsl 4 'opencode'" />
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="agents">
+      <div class="section-head">
+        <div class="section-head-main">
+          <span class="section-kicker">04 · Agents</span>
+          <h2>See who needs you before you look.</h2>
+          <p class="section-lede">
+            Herdr detects agents in panes and tracks their lifecycle. The sidebar becomes an inbox:
+            working, needs you, done, idle.
+          </p>
+        </div>
+        <div class="section-aside">opencode · pi · claude · codex<br />gemini · cursor · copilot · more</div>
+      </div>
+
+      <div class="agents-grid">
+        <div>
+          <div class="status-legend">
+            <div class="status-item">
+              <span class="dot" style="background:var(--green)"></span>
+              <div><b>Working</b><span>A turn is running. Leave it alone.</span></div>
+            </div>
+            <div class="status-item">
+              <span class="dot" style="background:var(--amber)"></span>
+              <div><b>Needs you</b><span>An approval or question is waiting.</span></div>
+            </div>
+            <div class="status-item">
+              <span class="dot" style="background:var(--accent)"></span>
+              <div><b>Done</b><span>Finished, unread. Focus clears the badge.</span></div>
+            </div>
+            <div class="status-item">
+              <span class="dot" style="background:var(--dim)"></span>
+              <div><b>Idle</b><span>Ready for the next prompt.</span></div>
+            </div>
+          </div>
+
+          <p style="color:var(--muted);font-size:13.5px;line-height:1.65">
+            Install the integration for the agents you use so Herdr can resume their native
+            conversation after a server restart:
+          </p>
+          <Command cmd="herdr integration install opencode" note="Also: claude, codex, pi, copilot, gemini, cursor…" />
+
+          <div class="note-callout">
+            <span class="mark">$</span>
+            <span>
+              <strong>Agents can drive Herdr too.</strong> Inside a managed pane,
+              <code>HERDR_ENV=1</code> and <code>herdr --skill</code> give an agent the rules for
+              splitting panes, prompting siblings, and waiting on output.
+            </span>
+          </div>
+        </div>
+
+        <div class="card agent-list">
+          <div class="agent-list-head"><span>agents · local</span><span>3 agents</span></div>
+
+          <div class="agent-row">
+            <span class="dot working"></span>
+            <div>
+              <span class="agent-name">opencode</span>
+              <span class="agent-meta">company / simple-demo · w1:t1</span>
+            </div>
+            <span class="agent-state working">working</span>
+          </div>
+
+          <div class="agent-row">
+            <span class="dot blocked"></span>
+            <div>
+              <span class="agent-name">pi</span>
+              <span class="agent-meta">company / simple-demo · w1:t1</span>
+            </div>
+            <span class="agent-state blocked">needs you</span>
+          </div>
+
+          <div class="agent-row">
+            <span class="dot done"></span>
+            <div>
+              <span class="agent-name">claude</span>
+              <span class="agent-meta">company / api-refactor · w1:t2</span>
+            </div>
+            <span class="agent-state done">done</span>
+          </div>
+
+          <Command
+            cmd='herdr agent prompt opencode "review the diff" --wait'
+            note="Waits for the next idle, done, or blocked state."
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cli">
+      <div class="section-head">
+        <div class="section-head-main">
+          <span class="section-kicker">05 · CLI</span>
+          <h2>If the UI can do it, the CLI returns JSON for it.</h2>
+          <p class="section-lede">
+            Workspaces, tabs, panes, agents, worktrees, notifications. Add
+            <code>--machine &lt;label&gt;</code> to run the same call against a saved SSH host.
+          </p>
+        </div>
+        <div class="section-aside">$HERDR_PANE_ID · $HERDR_TAB_ID<br />$HERDR_WORKSPACE_ID</div>
+      </div>
+
+      <div class="cli-groups">
+        {
+          cliGroups.map((group) => (
+            <article class="card cli-card">
+              <div class="cli-card-head">
+                <span class="glyph">{group.icon}</span>
+                <h3>{group.title}</h3>
+              </div>
+              <div class="commands">
+                {group.items.map((item) => <Command cmd={item.cmd} note={item.note} />)}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+
+      <div class="note-callout">
+        <span class="mark">→</span>
+        <span>
+          <strong>Use <code>--current</code> in scripts.</strong> It targets the pane that called the
+          command, not whatever another client has focused. Creation commands return the new IDs —
+          parse them instead of guessing.
+        </span>
+      </div>
+    </section>
+
+    <section class="section" id="config">
+      <div class="section-head">
+        <div class="section-head-main">
+          <span class="section-kicker">06 · Config</span>
+          <h2>It is a TOML file and a reload away.</h2>
+          <p class="section-lede">
+            Omarchy seeds Herdr with a tmux-shaped config: Ctrl+Space prefix, h/v splits, numbered tabs.
+            Edit it, check it, reload it.
+          </p>
+        </div>
+        <div class="section-aside">~/.config/herdr/config.toml<br />herdr --default-config</div>
+      </div>
+
+      <div class="config-grid">
+        <div class="config-copy">
+          <p>
+            Handy commands while you tune it. <code>omarchy-restart-herdr</code> is a reload of the
+            running server, not a kill — despite the name.
+          </p>
+
+          <Command cmd="herdr config check" note="Validate config.toml and print diagnostics." />
+          <Command cmd="omarchy-restart-herdr" note="Reload config in the running server." />
+          <Command cmd="omarchy-refresh-herdr" note="Replace config.toml with the Omarchy seed." />
+          <Command cmd="herdr --default-config" note="Print every option with its default." />
+
+          <ul class="omarchy-list">
+            <li><code>Super + Ctrl + Return</code><span>Launch or attach Herdr</span></li>
+            <li><code>Super + Ctrl + K</code><span>Annotated keybinding search, reading your live config</span></li>
+            <li><code>Super + S</code><span>Toggle the Hyprland scratchpad from any workspace</span></li>
+            <li><code>Super + Alt + S</code><span>Move the focused window into the scratchpad</span></li>
+            <li><code>Super + Ctrl + V</code><span>Omarchy clipboard history — handy for agent output</span></li>
+            <li><code>Print</code><span>Screenshot (Omarchy-wide)</span></li>
+            <li><code>h · c · cx · cy</code><span>Aliases: herdr, opencode, claude, codex</span></li>
+          </ul>
+        </div>
+
+        <div class="code-card">
+          <div class="code-card-head">
+            <span class="lock">◆</span>
+            ~/.config/herdr/config.toml
+          </div>
+          <pre><span class="c"># Omarchy seed: tmux session → workspace</span>
+<span class="c"># tmux window → tab, tmux pane → herdr pane</span>
+
+<span class="t">[theme]</span>
+<span class="k">name</span> = <span class="s">"terminal"</span>
+<span class="k">accent</span> = <span class="s">"blue"</span>
+
+<span class="t">[keys]</span>
+<span class="k">prefix</span> = <span class="s">"ctrl+space"</span>
+
+<span class="c"># panes</span>
+<span class="k">split_horizontal</span> = [<span class="s">"prefix+h"</span>, <span class="s">"alt+enter"</span>]
+<span class="k">split_vertical</span>   = [<span class="s">"prefix+v"</span>, <span class="s">"alt+shift+enter"</span>]
+<span class="k">new_tab</span>          = <span class="s">"prefix+c"</span>
+<span class="k">switch_tab</span>       = [<span class="s">"prefix+1..9"</span>, <span class="s">"alt+1..9"</span>]
+
+<span class="t">[ui]</span>
+<span class="k">mouse_capture</span> = <span class="v">true</span>
+<span class="k">confirm_close</span> = <span class="v">false</span>
+
+<span class="t">[ui.toast]</span>
+<span class="k">delivery</span> = <span class="s">"system"</span>
+
+<span class="t">[session]</span>
+<span class="k">resume_agents_on_restore</span> = <span class="v">true</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tips">
+      <div class="section-head">
+        <div class="section-head-main">
+          <span class="section-kicker">07 · Tips</span>
+          <h2>Small things that save a lot of keystrokes.</h2>
+        </div>
+      </div>
+
+      <div class="tips">
+        <article class="card tip">
+          <span class="tip-icon">pre</span>
+          <h3>Prefix, not Ctrl+B</h3>
+          <p>
+            The Omarchy seed sets <code>ctrl+space</code> to mirror its tmux config. If an IME owns that
+            chord, change <code>[keys] prefix</code> and run <code>omarchy-restart-herdr</code>.
+          </p>
+        </article>
+
+        <article class="card tip">
+          <span class="tip-icon">det</span>
+          <h3>Detach before you close</h3>
+          <p>
+            <code>Prefix d</code> leaves cleanly. Closing the window is harmless too: processes live in
+            the server, and <code>h</code> reattaches. <code>herdr server stop</code> is the one that
+            ends them.
+          </p>
+        </article>
+
+        <article class="card tip">
+          <span class="tip-icon">3×</span>
+          <h3>Three kinds of workspace</h3>
+          <p>
+            Hyprland: <code>Super 1…9</code>. Herdr: <code>Prefix Shift C</code>. Scratchpad:
+            <code>Super S</code>. They stack — a Herdr workspace survives on every Hyprland workspace.
+          </p>
+        </article>
+
+        <article class="card tip">
+          <span class="tip-icon">gui</span>
+          <h3>Mouse is allowed</h3>
+          <p>
+            Click panes, drag borders, right-click for split, rename, swap, and close. The seed config
+            keeps <code>mouse_capture = true</code>, so the pointer just works.
+          </p>
+        </article>
+
+        <article class="card tip">
+          <span class="tip-icon">ai</span>
+          <h3>Read before re-prompting</h3>
+          <p>
+            A timeout does not mean the prompt was lost. Check
+            <code>herdr agent read &lt;name&gt;</code> first. A blocked agent needs an answer, not
+            another nudge.
+          </p>
+        </article>
+
+        <article class="card tip">
+          <span class="tip-icon">git</span>
+          <h3>Worktrees are cheap</h3>
+          <p>
+            <code>Prefix Shift G</code> creates a git worktree and a workspace for it, so a risky
+            refactor gets its own checkout and its own agents without touching your branch.
+          </p>
+        </article>
+
+        <article class="card tip">
+          <span class="tip-icon">ntc</span>
+          <h3>Notifications, tuned</h3>
+          <p>
+            Background agents can ask the OS for attention: set <code>[ui.toast] delivery = "system"</code>
+            for desktop notifications and <code>[ui.sound] enabled = true</code> for a finish chime.
+          </p>
+        </article>
+
+        <article class="card tip">
+          <span class="tip-icon">upd</span>
+          <h3>Update on your channel</h3>
+          <p>
+            <code>herdr update</code> installs the latest build. Stay on stable, or opt into
+            <code>herdr channel set preview</code> when you want the new toys early.
+          </p>
+        </article>
+
+        <article class="card tip">
+          <span class="tip-icon">ses</span>
+          <h3>Restarts can resume agents</h3>
+          <p>
+            With an integration installed and <code>resume_agents_on_restore = true</code>, a server
+            restart brings panes back and resumes supported agents' native conversations.
+          </p>
+        </article>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('#key-filter');
+  const groups = [...document.querySelectorAll<HTMLElement>('.key-group')];
+  const empty = document.querySelector<HTMLElement>('#key-empty');
+  const count = document.querySelector<HTMLElement>('[data-key-count]');
+  const total = groups.reduce((sum, group) => sum + Number(group.dataset.total ?? 0), 0);
+
+  function applyFilter() {
+    if (!input) return;
+
+    const query = input.value.trim().toLowerCase();
+    let visible = 0;
+
+    for (const group of groups) {
+      const rows = [...group.querySelectorAll<HTMLElement>('.key-row')];
+      let shown = 0;
+
+      for (const row of rows) {
+        const match = !query || (row.dataset.search ?? '').includes(query);
+        row.hidden = !match;
+        if (match) shown += 1;
+      }
+
+      group.hidden = shown === 0;
+      visible += shown;
+
+      const label = group.querySelector<HTMLElement>('.count');
+      const groupTotal = Number(group.dataset.total ?? 0);
+      if (label) {
+        label.textContent = query ? `${shown} / ${groupTotal}` : `${groupTotal} keys`;
+      }
+    }
+
+    if (empty) empty.hidden = visible !== 0;
+    if (count) count.textContent = query ? `${visible} of ${total} bindings` : `${total} bindings`;
+  }
+
+  input?.addEventListener('input', applyFilter);
+
+  input?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      input.value = '';
+      applyFilter();
+      input.blur();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const target = event.target as HTMLElement | null;
+    const typing = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable;
+
+    if (event.key === '/' && !typing) {
+      event.preventDefault();
+      input?.focus();
+      input?.select();
+    }
+  });
+</script>
