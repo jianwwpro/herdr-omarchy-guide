@@ -1,5 +1,9 @@
 # quick 11/03/2026
 
+Live site: **https://jianwwpro.github.io/herdr-omarchy-guide/**
+
+Notes on using agents inside [herdr](https://github.com/getomarchy/herdr) on Omarchy, built as a single-page Astro site.
+
 Agents 工具都在这个 herdr 里面使用
 
 第二个是， super  + S， scratchpad
